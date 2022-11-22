@@ -9,17 +9,23 @@
   </head>
   <body>
 
-      <!-- <h1>[image finder]</h1> -->
-      <form class="search-form" id="search-form">
-        <input type="text" name="searchQuery" autocomplete="off" placeholder="Search images..." />
-        <button type="submit" id="search-btn">Search</button>
-      </form>
+      <div class="topnav">
+        <div class="form-container">
+          <form class="search-form" id="search-form">
+            <input type="text" name="searchQuery" autocomplete="off" placeholder="Search images..." class="form-input"/>
+            <button type="submit" id="search-btn" class="btn">&#128269;</button>
+          </form>
+        </div>
+      </div>
 
       <div class="gallery">
         <!-- Картки зображень -->
       </div>
       
-      <button type="button" class="load-more-btn hidden js-load-more">Load more</button>
+      
+      <div class="btn-wrapper">
+        <button type="button" class="btn-load-more hidden js-load-more">Load more images</button>
+      </div>
 
 
     <!-- ❗️❗️❗️ Add partials like so for every page -->

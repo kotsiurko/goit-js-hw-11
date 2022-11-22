@@ -1,5 +1,3 @@
-const galleryEl = document.querySelector('.gallery');
-
 export default function renderHTML(elemsArray) {
   return elemsArray
     .map(el => {
@@ -12,24 +10,31 @@ export default function renderHTML(elemsArray) {
         comments,
         downloads,
       } = el;
-      console.log(el);
-      return `<div class="photo-card">
-              <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+      return `
+          <a class="gallery__item" href="${largeImageURL}">
+            <div class="photo-card">
+              <img src="${webformatURL}" alt="${tags}" loading="lazy" class="gallery__image"/>
               <div class="info">
                 <p class="info-item">
-                  <b>Likes: ${likes}</b>
+                  <b>Likes</b>
+                  ${likes}
                 </p>
                 <p class="info-item">
-                  <b>Views: ${views}</b>
+                  <b>Views</b>
+                  ${views}
                 </p>
                 <p class="info-item">
-                  <b>Comments: ${comments}</b>
+                  <b>Comments</b>
+                  ${comments}
                 </p>
                 <p class="info-item">
-                  <b>Downloads: ${downloads}</b>
+                  <b>Downloads</b>
+                  ${downloads}
                 </p>
               </div>
-            </div>`;
+            </div>
+          </a>
+            `;
     })
     .join('');
 }
