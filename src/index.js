@@ -17,7 +17,6 @@ let simpleLightbox = new SimpleLightbox('.gallery a', {
   captionDelay: 250,
 });
 
-// console.log(pixabayAPI);
 searchFormEl.addEventListener('submit', onSearchFormSubmit);
 loadMoreBtnEl.addEventListener('click', onLoadMoreBtnClick);
 let totalPages = null;
@@ -32,9 +31,6 @@ async function onSearchFormSubmit(event) {
     const { data } = await pixabayAPI.fetchImages();
 
     if (data.total === 0) {
-      console.log(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
       Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
@@ -42,19 +38,16 @@ async function onSearchFormSubmit(event) {
     }
 
     // Page counter
-    totalPages = data.total / data.hits.length;
+    totalPages = Math.round(data.total / data.hits.length);
 
     galleryEl.innerHTML = renderHTML(data.hits);
     simpleLightbox.refresh();
     loadMoreBtnEl.classList.remove('hidden');
 
     // Виконую перевірку на випадок ДУУУЖЕ рідкісного запиту
-    if (pixabayAPI.page === Math.round(totalPages)) {
-      console.log('Ми дійшли до кінця');
+    if (pixabayAPI.page === totalPages) {
       loadMoreBtnEl.classList.add('hidden');
     }
-
-    // end of smooth scroll
   } catch (err) {
     console.log(err);
   }
@@ -67,7 +60,7 @@ async function onLoadMoreBtnClick(event) {
   try {
     const { data } = await pixabayAPI.fetchImages();
 
-    // виконую рендур елементів
+    // виконую рендер елементів
     galleryEl.insertAdjacentHTML('beforeend', renderHTML(data.hits));
     simpleLightbox.refresh();
 
@@ -82,33 +75,11 @@ async function onLoadMoreBtnClick(event) {
     });
 
     // Виконую перевірку на переміщення до останньої сторінки
-    if (pixabayAPI.page === Math.round(totalPages)) {
-      // console.log('Ми дійшли до кінця');
-      console.log("We're sorry, but you've reached the end of search results.");
-      // Notify.info("We're sorry, but you've reached the end of search results.");
+    if (pixabayAPI.page === totalPages) {
+      Notify.info("We're sorry, but you've reached the end of search results.");
       loadMoreBtnEl.classList.add('hidden');
     }
   } catch (err) {
     console.log(err);
   }
-
-  // pixabayAPI.fetchImages().then(({ data }) => {
-  //   // Page counter
-  //   console.log('Current Page : ', pixabayAPI.page);
-  //   console.log('total Pages: ', totalPages);
-
-  //   // виконую рендур елементів
-  //   galleryEl.insertAdjacentHTML('beforeend', renderHTML(data.hits));
-  //   simpleLightbox.refresh();
-
-  //   // Виконую перевірку на переміщення до останньої сторінки
-  //   if (pixabayAPI.page === totalPages) {
-  //     console.log('Ми дійшли до кінця');
-  //     loadMoreBtnEl.classList.add('hidden');
-  //   }
-  //   console.log(data);
-  // });
-  // .catch(err => {
-  //   console.log(err);
-  // });
 }
