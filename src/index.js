@@ -38,7 +38,7 @@ async function onSearchFormSubmit(event) {
     }
 
     // Page counter
-    totalPages = Math.round(data.total / data.hits.length);
+    totalPages = Math.ceil(data.total / data.hits.length);
 
     galleryEl.innerHTML = renderHTML(data.hits);
     simpleLightbox.refresh();
