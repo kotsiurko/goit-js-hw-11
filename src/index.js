@@ -8,7 +8,7 @@ import { Notify } from 'notiflix';
 
 const searchFormEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
-const loadMoreBtnEl = document.querySelector('.js-load-more');
+const targetElement = document.querySelector('.js-target-element');
 
 const pixabayAPI = new PixabayAPI();
 
@@ -18,7 +18,6 @@ let simpleLightbox = new SimpleLightbox('.gallery a', {
 });
 
 searchFormEl.addEventListener('submit', onSearchFormSubmit);
-loadMoreBtnEl.addEventListener('click', onLoadMoreBtnClick);
 let totalPages = null;
 
 async function onSearchFormSubmit(event) {
@@ -42,44 +41,55 @@ async function onSearchFormSubmit(event) {
 
     galleryEl.innerHTML = renderHTML(data.hits);
     simpleLightbox.refresh();
-    loadMoreBtnEl.classList.remove('hidden');
 
     // Виконую перевірку на випадок ДУУУЖЕ рідкісного запиту
     if (pixabayAPI.page === totalPages) {
       loadMoreBtnEl.classList.add('hidden');
     }
+    observer.observe(targetElement);
   } catch (err) {
     console.log(err);
   }
 }
 
 // Pagination
-async function onLoadMoreBtnClick(event) {
-  pixabayAPI.page += 1;
+const observer = new IntersectionObserver(
+  async (entries, observer) => {
+    if (entries[0].isIntersecting) {
+      pixabayAPI.page += 1;
 
-  try {
-    const { data } = await pixabayAPI.fetchImages();
+      try {
+        const { data } = await pixabayAPI.fetchImages();
 
-    // виконую рендер елементів
-    galleryEl.insertAdjacentHTML('beforeend', renderHTML(data.hits));
-    simpleLightbox.refresh();
+        // виконую рендер елементів
+        galleryEl.insertAdjacentHTML('beforeend', renderHTML(data.hits));
+        simpleLightbox.refresh();
 
-    // Smooth scroll
-    const { height: cardHeight } = document
-      .querySelector('.gallery')
-      .firstElementChild.getBoundingClientRect();
+        // Smooth scroll
+        const { height: cardHeight } = document
+          .querySelector('.gallery')
+          .firstElementChild.getBoundingClientRect();
 
-    window.scrollBy({
-      top: cardHeight * 2,
-      behavior: 'smooth',
-    });
+        window.scrollBy({
+          top: cardHeight * 2,
+          behavior: 'smooth',
+        });
 
-    // Виконую перевірку на переміщення до останньої сторінки
-    if (pixabayAPI.page === totalPages) {
-      Notify.info("We're sorry, but you've reached the end of search results.");
-      loadMoreBtnEl.classList.add('hidden');
+        // Виконую перевірку на переміщення до останньої сторінки
+        if (pixabayAPI.page === totalPages) {
+          Notify.info(
+            "We're sorry, but you've reached the end of search results."
+          );
+          observer.unobserve(targetElement);
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
-  } catch (err) {
-    console.log(err);
+  },
+  {
+    root: null,
+    rootMargin: '0px 0px 100px 0px',
+    threshold: 1,
   }
-}
+);
